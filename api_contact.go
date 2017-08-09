@@ -98,6 +98,8 @@ func (c *DingTalkClient) UserInfoByCode(code string) (User, error) {
     params := url.Values{}
     params.Add("code", code)
     err :=c.httpRPC("user/getuserinfo", params, nil, &data)
+    params.Add("userid",data.Userid)
+    err =c.httpRPC("user/get", params, nil, &data)
     return data, err
 }
 
