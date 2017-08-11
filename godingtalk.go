@@ -17,6 +17,17 @@ const (
 	ROOT = "https://oapi.dingtalk.com/"
 )
 
+//DingTalk Jsapi权限验证配置信息
+type DingTalkConfig struct {
+	AgentId   string
+	CorpId    string
+	TimeStamp string
+	NonceStr  string
+	Signature string
+	Url       string
+	Ticket    string
+}
+
 //DingTalkClient is the Client to access DingTalk Open API
 type DingTalkClient struct {
 	CorpID      string
@@ -156,6 +167,22 @@ func (c *DingTalkClient) GetConfig(nonceStr string, timestamp string, url string
 	bytes, _ := json.Marshal(&config)
 	return string(bytes)
 }
+
+//获取JSAPI验证配置信息
+func (c *DingTalkClient) GetJsapiConfig(nonceStr string, timestamp string, url string) DingTalkConfig {
+	ticket, _ := c.GetJsAPITicket()
+	d := DingTalkConfig{
+		Url:url,
+		NonceStr:nonceStr,
+		AgentId:c.AgentID,
+		TimeStamp:timestamp,
+		CorpId:c.CorpID,
+		Ticket:ticket,
+		Signature:Sign(ticket, nonceStr, timestamp, url),
+	}
+	return d
+}
+
 
 //Sign is 签名
 func Sign(ticket string, nonceStr string, timeStamp string, url string) string {
