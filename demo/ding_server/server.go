@@ -10,7 +10,30 @@ import (
 	"time"
 
 	"github.com/hugozhu/godingtalk"
+	"gopkg.in/yaml.v2"
+	"io/ioutil"
+	"log"
 )
+
+type conf struct {
+	CorpId     string `yaml:"corpId"`
+	CorpSecret string `yaml:"corpSecret"`
+	AgentID    string `yaml:"agentID"`
+}
+
+func (c *conf) getConf() *conf {
+
+	yamlFile, err := ioutil.ReadFile("conf.yaml")
+	if err != nil {
+		log.Printf("yamlFile.Get err   #%v ", err)
+	}
+	err = yaml.Unmarshal(yamlFile, c)
+	if err != nil {
+		log.Fatalf("Unmarshal: %v", err)
+	}
+
+	return c
+}
 
 func GetTemplate(tpl string) *template.Template {
 	t, _ := template.ParseFiles(tpl)
@@ -71,10 +94,12 @@ func serveTemplate(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	corpId := os.Getenv("corpId")
-	corpSecret := os.Getenv("corpSecret")
+	var c conf
+	c.getConf()
+	corpId := c.CorpId
+	corpSecret := c.CorpSecret
 	client = godingtalk.NewDingTalkClient(corpId, corpSecret)
-	client.AgentID = os.Getenv("agentID")
+	client.AgentID = c.AgentID
 
 	fs := http.FileServer(http.Dir(path.Join(os.Getenv("root"), "public")))
 	http.Handle("/public/", http.StripPrefix("/public/", fs))
@@ -82,5 +107,5 @@ func main() {
 	http.HandleFunc("/get_user_info", getUserInfo)
 	http.HandleFunc("/send_message", sendMessage)
 
-	http.ListenAndServe(":8000", nil)
+	http.ListenAndServe(":9091", nil)
 }

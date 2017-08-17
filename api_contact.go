@@ -55,7 +55,8 @@ type DepartmentList struct {
 // DepartmentList is 获取部门列表
 func (c *DingTalkClient) DepartmentList() (DepartmentList, error) {
     var data DepartmentList
-    err := c.httpRPC("department/list", nil, nil, &data)   
+
+    err := c.httpRPC("department/list", nil, nil, &data)
     return data, err
 }
 

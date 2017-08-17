@@ -74,6 +74,8 @@ type AccessTokenResponse struct {
 	Created     int64
 }
 
+
+
 //CreatedAt is when the access token is generated
 func (e *AccessTokenResponse) CreatedAt() int64 {
 	return e.Created
@@ -147,6 +149,7 @@ func (c *DingTalkClient) GetJsAPITicket() (ticket string, err error) {
 	err = c.httpRPC("get_jsapi_ticket", nil, nil, &data)
 	if err == nil {
 		ticket = data.Ticket
+
 		cache.Set(&data)
 	}
 	return ticket, err
